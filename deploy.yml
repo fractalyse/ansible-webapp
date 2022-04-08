@@ -2,33 +2,41 @@
   hosts: prod
   gather_facts: yes
   become: true
-#  vars:
-#    ansible_sudo_pass: admin
-#    ansible_user: admin
 
   pre_tasks:
-#    - name: "Check for required packages"
-#      package:
-#        name: epel-release
-#        state: present
-#      when: ansible_distribution == "CentOS"
+
+    - name: "Install epel-release, git & wget"
+      package:
+        name: "{{ item }}"
+        state: present
+      when: ansible_distribution == "CentOS"
+      loop:
+        - epel-release
+        - git
+        - wget
 
     - name: "Get pip install script"
       get_url:
         url: https://bootstrap.pypa.io/pip/2.7/get-pip.py
         dest: /tmp/get-pip.py
-
     - name: "Install pip"
+      changed_when: false
       command: python2.7 /tmp/get-pip.py
-
     - name: "Install docker-py using script"
       pip:
         name: docker-py
 
   tasks:
+    - name: "Copy website file template"
+      template:
+        src: /home/admin/ansible-webapp/templates/index.html.j2
+        dest: /home/admin/index.html
+
     - name: "Create apache container"
       docker_container:
         name: webapp
         image: httpd
         ports:
           - "80:80"
+        volumes:
+          - /home/admin/index.html:/usr/local/apache2/htdocs/index.html
