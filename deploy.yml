@@ -2,6 +2,8 @@
   hosts: prod
   gather_facts: yes
   become: true
+  vars_files:
+    - files/secrets/credentials.vault
 
   pre_tasks:
 
