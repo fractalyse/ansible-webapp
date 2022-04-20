@@ -3,7 +3,7 @@
   gather_facts: yes
   become: true
   vars_files:
-    - files/secrets/credentials.vault
+    - files/secrets/credentials.yml
 
   pre_tasks:
 
